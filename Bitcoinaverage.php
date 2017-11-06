@@ -1,13 +1,31 @@
 <?php
 
+/**
+  * Simple Bitcoinaverage (https://bitcoinaverage.com/) PHP Client
+  *
+  * @author Simeon Ackermann
+  */
+
 class Bitcoinaverage
 {
+    /**
+      * {string} Bitcoinaverage base URL
+      */
     const BASE_URL = 'https://apiv2.bitcoinaverage.com';
 
+    /**
+      * {string} Your public key
+      */
     private $publicKey;
 
+    /**
+      * {string} Your secret key
+      */
     private $secretKey;
 
+    /**
+      * API endpoints
+      */
     private $apiUrls = array(
         'symbols'           => '/constants/symbols',
         'symbolsMarket'     => '/constants/symbols/{market}',
@@ -16,6 +34,14 @@ class Bitcoinaverage
         'convert'           => '/convert/{market}?from={source_cur}&to={target_cur}&amount={amount}',
     );
 
+    /**
+      * Constructor function
+      *
+      * @param string Your public key
+      * @param string Your secret key
+      *
+      * @return void
+      */
     public function __construct($publicKey = null, $secretKey = null)
     {
         $this->publicKey = $publicKey;
@@ -28,6 +54,11 @@ class Bitcoinaverage
         }
     }
 
+    /**
+      * Destructor function
+      *
+      * @return void
+      */
     public function __destruct()
     {
         $this->auth = null;
@@ -83,6 +114,14 @@ class Bitcoinaverage
         return json_decode($str, $assoc);
     }
 
+    /**
+      * Get formatted price
+      *
+      * @param integer Price
+      * @param string Currency
+      *
+      * @return
+      */
     public function formatPrice($amount = 1, $currency = 'BTC')
     {
         $decimals = $currency == 'BTC' ? 8 : 2;
@@ -90,6 +129,15 @@ class Bitcoinaverage
         return number_format($amount, $decimals, ',', '.');
     }
 
+    /**
+      * Get Bitcoinaverage ticker
+      *
+      * @param string Selected currency, get multiple with comma seperated
+      * @param string Crypo currency
+      * @param string Global or local market
+      *
+      * @return string JSON ticker result
+      */
     public function ticker($fiat = 'EUR', $crypto = 'BTC', $market = 'global')
     {
         $url = $this->prepAllUrl( array(
@@ -101,11 +149,16 @@ class Bitcoinaverage
         return $this->output($this->request($url));
     }
 
-    public function tickerShort()
-    {
-
-    }
-
+    /**
+      * Convert prices
+      *
+      * @param string From currency
+      * @param string To currency
+      * @param ingeger Price amount
+      * @param string Global or local market
+      *
+      * @return string JSON string with converted price
+      */
     public function convert($from = 'BTC', $to = 'EUR', $amount = 1, $market = 'global')
     {
         $url = $this->prepAllUrl( array(
